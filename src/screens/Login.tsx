@@ -1,17 +1,21 @@
 import {StyleSheet, Text, View} from 'react-native';
 import React, {useState} from 'react';
-import UserInput from '../component/Login/UserInput';
-import LoginButton from '../component/Login/LoginButton';
-import Header from '../component/Login/Header';
-import Bottom from '../component/Login/Bottom';
+import UserInput from '../component/LoginAndSignUp/UserInput';
+import LoginButton from '../component/LoginAndSignUp/LoginButton';
+import LoginHeader from '../component/LoginAndSignUp/LoginHeader';
+import Bottom from '../component/LoginAndSignUp/Bottom';
+import { NavigationProp } from '../navigation/NavigationProp';
 
-const Login = () => {
+interface propsType{
+navigation:NavigationProp
+}
+const Login = ({navigation}:propsType) => {
   const [userName, setUserName] = useState<string>('');
   const [UserPassword, setUserPassword] = useState<string>('');
 
   return (
     <View style={styles.container}>
-      <Header />
+      <LoginHeader />
 
       <UserInput
         value={userName}
@@ -23,7 +27,7 @@ const Login = () => {
         setValue={setUserPassword}
         placeHolder="Enter Your Password"
       />
-      <LoginButton />
+      <LoginButton title="Login" onPress={()=>navigation.navigate("SignUp",{"name":"shivam"})} />
       <Bottom />
     </View>
   );

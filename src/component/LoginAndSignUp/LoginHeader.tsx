@@ -1,7 +1,7 @@
 import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 
-const Header = () => {
+const LoginHeader = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.headingText}>Welcome Back!</Text>
@@ -10,7 +10,7 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default LoginHeader;
 
 const styles = StyleSheet.create({
     container:{

@@ -1,13 +1,20 @@
-import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, View, TouchableOpacity, GestureResponderEvent} from 'react-native';
 import React from 'react';
 
-const LoginButton = () => {
+
+
+interface propsType{
+  title:string,
+  onPress(): void
+}
+const LoginButton = ({title,onPress}:propsType) => {
+  // console.log(typeof onPress)
   return (
     <TouchableOpacity
-    // onPress={}
+    onPress={onPress}
     activeOpacity={0.6}
      style={styles.buttonContainer}>
-      <Text style={styles.buttonText}>Login</Text>
+      <Text style={styles.buttonText}>{title}</Text>
     </TouchableOpacity>
   );
 };

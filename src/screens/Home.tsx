@@ -1,8 +1,8 @@
 import {ScrollView,StyleSheet, Text, View, SafeAreaView} from 'react-native';
 import React, {useState} from 'react';
 import HeadingInput from '../component/Home/HeadingInput';
-import Button from '../component/Home/Button';
 import RenderItem from '../component/Home/RenderItem';
+import HomeButton from '../component/Home/HomeButton';
 
 const Home = () => {
   const [title, setTitle] = useState<string>('');
@@ -64,7 +64,7 @@ const Home = () => {
         placeHolder="Add Description"
       />
 
-      <Button />
+      <HomeButton />
 
 <ScrollView style={{marginTop:10}} showsVerticalScrollIndicator={false} >
 

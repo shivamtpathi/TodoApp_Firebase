@@ -1,7 +1,7 @@
 import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import React from 'react';
 
-const Button = () => {
+const HomeButton = () => {
   return (
     <TouchableOpacity
       // onPress={}
@@ -12,7 +12,7 @@ const Button = () => {
   );
 };
 
-export default Button;
+export default HomeButton;
 
 const styles = StyleSheet.create({
   buttonContainer: {
