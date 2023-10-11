@@ -1,13 +1,15 @@
 import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import React from 'react';
-
-const Bottom = () => {
+interface propstype{
+  createAccountButton():void
+}
+const Bottom = ({createAccountButton}:propstype) => {
   return (
     <View style={styles.container}>
       <TouchableOpacity activeOpacity={0.6}>
         <Text style={styles.text}>Forgotten Password?</Text>
       </TouchableOpacity>
-      <TouchableOpacity activeOpacity={0.6}>
+      <TouchableOpacity onPress={createAccountButton} activeOpacity={0.6}>
         <Text style={styles.text}>Or Create a New Account</Text>
       </TouchableOpacity>
     </View>

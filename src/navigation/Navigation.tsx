@@ -1,21 +1,25 @@
-import { NavigationContainer } from '@react-navigation/native'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import Login from '../screens/Login'
-import SignUp from '../screens/SignUp'
-import { ScreenList } from './NavigationProp'
+import {NavigationContainer} from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
 
+import AuthStack from './AuthStack';
+import auth from '@react-native-firebase/auth';
+import HomeNavigation from './HomeNavigation';
 const Navigation = () => {
-  const stack = createNativeStackNavigator<ScreenList>()
+  const [user, setUser] = useState();
+  const onAuthStateChanged = (user: any) => {
+    setUser(user);
+  };
+  useEffect(() => {
+    auth().onAuthStateChanged(onAuthStateChanged);
+    // return subscriber; // unsubscribe on unmount
+  }, []);
+
   return (
-    <NavigationContainer >
-      <stack.Navigator screenOptions={{ headerShown: false }} initialRouteName='Login' >
-        <stack.Screen name="Login" component={Login}  />
-        <stack.Screen name="SignUp" component={SignUp}  />
-
-      </stack.Navigator>
+    <NavigationContainer>
+      {user ? <HomeNavigation /> : <AuthStack />}
+      {/* <HomeNavigation /> */}
     </NavigationContainer>
-  )
-}
+  );
+};
 
-export default Navigation
-
+export default Navigation;

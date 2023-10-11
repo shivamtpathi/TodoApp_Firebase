@@ -3,16 +3,18 @@ import React from 'react'
 
 interface propsType {
   value: string;
-  setValue: React.Dispatch<React.SetStateAction<string>>;
   placeHolder: string;
+  onChangeText?:((text:string)=>void);
+  secureTextEntry?:boolean
 }
 
-const UserInput = ({value, setValue, placeHolder}: propsType) => (
+const UserInput = ({value,  placeHolder,onChangeText,secureTextEntry}: propsType) => (
   <TextInput
       style={styles.Input}
       placeholder={placeHolder}
-      onChangeText={e => setValue(e)}
+      onChangeText={onChangeText}
       value={value}
+      secureTextEntry={secureTextEntry}
     />
 )
 

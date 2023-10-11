@@ -4,7 +4,8 @@ import { NavigationProp as prop, RouteProp } from '@react-navigation/native';
 
 export type ScreenList = {
   Login: undefined;
-  SignUp: {name:string};
+  SignUp: undefined;
+  Home:undefined
   // Add more routes here if needed
 };
 

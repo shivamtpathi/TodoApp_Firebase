@@ -19,10 +19,11 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 25,
     backgroundColor: 'green',
-    width: 60,
+    // width: 60,
     alignItems: 'center',
     borderRadius: 3,
-    height: 50,
+    height: 40,
+    width:"100%",
     justifyContent: 'center',
   },
   buttonText: {

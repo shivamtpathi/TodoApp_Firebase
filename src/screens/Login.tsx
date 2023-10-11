@@ -1,35 +1,81 @@
-import {StyleSheet, Text, View} from 'react-native';
-import React, {useState} from 'react';
+import { Alert, StyleSheet, Text, View } from 'react-native';
+import React from 'react';
 import UserInput from '../component/LoginAndSignUp/UserInput';
 import LoginButton from '../component/LoginAndSignUp/LoginButton';
 import LoginHeader from '../component/LoginAndSignUp/LoginHeader';
 import Bottom from '../component/LoginAndSignUp/Bottom';
 import { NavigationProp } from '../navigation/NavigationProp';
+import auth from '@react-native-firebase/auth';
+import { Formik } from 'formik';
+import * as yup from 'yup';
 
-interface propsType{
-navigation:NavigationProp
+interface propsType {
+  navigation: NavigationProp;
 }
-const Login = ({navigation}:propsType) => {
-  const [userName, setUserName] = useState<string>('');
-  const [UserPassword, setUserPassword] = useState<string>('');
+
+const validationSchema = yup.object().shape({
+  email: yup
+    .string()
+    .required('Email is required')
+    .email('Invalid email format'),
+  UserPassword: yup
+    .string()
+    .required('Password is required')
+    .min(6, 'Password must be at least 6 characters')
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/,
+      'Password must contain at least one uppercase letter, one lowercase letter, and one number'
+    ),
+});
+
+const Login = ({ navigation }: propsType) => {
+  const HandleLogin = async (values: { email: string; UserPassword: string }) => {
+    try {
+      const { email, UserPassword } = values;
+      const userCredential = await auth().signInWithEmailAndPassword(email, UserPassword);
+      // console.log('userCredential', userCredential);
+      // navigation.navigate('SignUp');
+    } catch (error) {
+      console.log('Login Error', error);
+      Alert.alert('Something Went Wrong', 'Please Check Your Email And Password');
+    }
+  };
 
   return (
-    <View style={styles.container}>
-      <LoginHeader />
+    <Formik
+      initialValues={{ email: '', UserPassword: '' }}
+      validationSchema={validationSchema}
+      onSubmit={HandleLogin}
+    >
+      {({ values, handleChange, handleSubmit, errors, touched, isValid }) => (
+        <View style={styles.container}>
+          <LoginHeader />
 
-      <UserInput
-        value={userName}
-        setValue={setUserName}
-        placeHolder="Enter Your UserName"
-      />
-      <UserInput
-        value={UserPassword}
-        setValue={setUserPassword}
-        placeHolder="Enter Your Password"
-      />
-      <LoginButton title="Login" onPress={()=>navigation.navigate("SignUp",{"name":"shivam"})} />
-      <Bottom />
-    </View>
+          <UserInput
+            value={values.email}
+            onChangeText={handleChange('email')}
+            placeHolder="Enter Your Email"
+          />
+          {touched.email && errors.email && (
+            <Text style={styles.errorText}>{errors.email}</Text>
+          )}
+
+          <UserInput
+            value={values.UserPassword}
+            onChangeText={handleChange('UserPassword')}
+            placeHolder="Enter Your Password"
+            secureTextEntry
+          />
+          {touched.UserPassword && errors.UserPassword && (
+            <Text style={styles.errorText}>{errors.UserPassword}</Text>
+          )}
+
+          <LoginButton title="Login" onPress={handleSubmit} />
+
+          <Bottom createAccountButton={() => navigation.navigate('SignUp')} />
+        </View>
+      )}
+    </Formik>
   );
 };
 
@@ -38,5 +84,10 @@ export default Login;
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 12,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+    marginBottom: 5,
   },
 });
