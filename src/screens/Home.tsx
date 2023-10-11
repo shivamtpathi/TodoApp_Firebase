@@ -1,76 +1,94 @@
 import {
   ScrollView,
   StyleSheet,
-  Text,
-  View,
   SafeAreaView,
   TouchableOpacity,
-  FlatList,
+  ActivityIndicator,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import HeadingInput from '../component/Home/HeadingInput';
 import RenderItem from '../component/Home/RenderItem';
 import HomeButton from '../component/Home/HomeButton';
 import auth from '@react-native-firebase/auth';
-import Icon from 'react-native-vector-icons/AntDesign'
-import { Alert } from 'react-native';
+import Icon from 'react-native-vector-icons/AntDesign';
+import {Alert} from 'react-native';
+import firestore from '@react-native-firebase/firestore';
 
 const Home = () => {
   const [title, setTitle] = useState<string>('');
-  const [description, setDescription] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [getloading, setGetLoading] = useState<boolean>(true);
 
-  const data = [
-    {
-      title: 'HomeWork',
-      description:
-        'hello how are you kinnincis ncini incindi incidnsiijidjsijdijid jndiwqijdijwiqjdiwj',
-    },
-    {
-      title: 'Buy Vegetable',
-      description: 'hello how are you kinnincis ncini incindi incidnsi',
-    },
-    {
-      title: 'BUy Car',
-      description: 'hello how are you kinnincis ncini incindi incidnsi',
-    },
-    {
-      title: 'Learn History',
-      description: 'hello how are you kinnincis ncini incindi incidnsi',
-    },
-    {
-      title: 'Learn History',
-      description: 'hello how are you kinnincis ncini incindi incidnsi',
-    },
-    {
-      title: 'Learn History',
-      description: 'hello how are you kinnincis ncini incindi incidnsi',
-    },
-    {
-      title: 'Learn History',
-      description: 'hello how are you kinnincis ncini incindi incidnsi',
-    },
-    {
-      title: 'Learn History',
-      description:
-        'hello how are you kinnincis ncini incindi incidnsi kmdisjijsijisjisj',
-    },
-    {
-      title: 'Learn History',
-      description: 'hello how are you kinnincis ncini incindi incidnsi',
-    },
-    {
-      title: 'Learn History',
-      description: 'hello how are you kinnincis ncini incindi incidnsi',
-    },
-  ];
-  // const handleLogout = async () => {
-  //   try {
-  //     await auth().signOut(); // Sign out the user
-  //     // You can add any additional logic here, such as navigating to the login screen.
-  //   } catch (error) {
-  //     console.error('Error signing out:', error);
-  //   }
-  // };
+  const [description, setDescription] = useState<string>('');
+  const [data, setData] = useState<
+    {id: string; title: string; description: string}[]
+  >([]);
+
+  const user = auth().currentUser;
+  const userCollection = firestore().collection('users').doc(user?.uid);
+  const fetchTasks = async () => {
+    // setLoading(true)
+    try {
+      const snapshot = await userCollection.collection('tasks').get();
+      const tasksData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as {id: string; title: string; description: string}[];
+      setData(tasksData);
+      // setLoading(false)
+    } catch (error) {
+      console.log('Fetch tasks error', error);
+      setGetLoading(false);
+    } finally {
+      setGetLoading(false);
+    }
+  };
+
+  const Post = async () => {
+    setLoading(true);
+    if (title == '' || description == '') {
+      Alert.alert('please add work with it description');
+    } else
+      try {
+        await userCollection.collection('tasks').add({
+          title,
+          description,
+        });
+        setDescription('');
+        setTitle('');
+        fetchTasks();
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+
+        console.log('Post task error', error);
+      }
+  };
+  const deleteTask = (taskId: string) => {
+    Alert.alert(
+      'Confirm Delete',
+      'Are you sure you want to delete this task?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: async () => {
+            try {
+              await userCollection.collection('tasks').doc(taskId).delete();
+              fetchTasks();
+            } catch (error) {
+              console.log('Delete task error', error);
+            }
+          },
+        },
+      ],
+      {cancelable: false},
+    );
+  };
+
   const handleLogout = () => {
     Alert.alert(
       'Confirm Logout',
@@ -84,24 +102,23 @@ const Home = () => {
           text: 'Logout',
           onPress: async () => {
             try {
-              await auth().signOut(); // Sign out the user
-              // You can add any additional logic here, such as navigating to the login screen.
+              await auth().signOut();
             } catch (error) {
               console.error('Error signing out:', error);
             }
           },
         },
       ],
-      { cancelable: false }
+      {cancelable: false},
     );
   };
+  useEffect(() => {
+    fetchTasks();
+  }, []);
   return (
     <SafeAreaView style={styles.container}>
-
       <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-
         <Icon name="logout" size={30} color="green" />
-
       </TouchableOpacity>
       <HeadingInput
         value={title}
@@ -114,16 +131,23 @@ const Home = () => {
         placeHolder="Add Description"
       />
 
-      <HomeButton />
+      <HomeButton loading={loading} onPress={Post} />
 
       <ScrollView style={{marginTop: 10}} showsVerticalScrollIndicator={false}>
-        {data.map((item, index) => (
-          <RenderItem
-            title={item.title}
-            description={item.description}
-            key={index}
-          />
-        ))}
+        {getloading ? (
+          <ActivityIndicator size={30} color="green" />
+        ) : (
+          data.map((item, index) => (
+            <RenderItem
+              id={item.id}
+              title={item.title}
+              description={item.description}
+              key={item.id}
+              onPressDelete={() => deleteTask(item.id)}
+              userCollection={userCollection}
+            />
+          ))
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -138,15 +162,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logoutButton: {
-  
-  alignItems:"flex-end",
-  marginTop:15,
-  justifyContent:"center",
-  marginRight:10
-  
-
-   
+    alignItems: 'flex-end',
+    marginTop: 15,
+    justifyContent: 'center',
+    marginRight: 10,
   },
-
- 
 });

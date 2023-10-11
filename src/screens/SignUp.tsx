@@ -8,14 +8,12 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {Formik} from 'formik';
 import * as yup from 'yup';
-interface propsType {
-  navigation: NavigationProp;
-}
+
 interface User {
   userName: string;
   email: string;
 }
-const SignUp = ({navigation}: propsType) => {
+const SignUp = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const validationSchema = yup.object().shape({
     email: yup
@@ -54,7 +52,7 @@ const SignUp = ({navigation}: propsType) => {
         .doc(userCredential.user.uid)
         .set(user);
       setLoading(false);
-      navigation.navigate('Login');
+      // navigation.navigate('SignUp');
     } catch (error: any) {
       console.log('Error signing up:', error);
       setLoading(false);

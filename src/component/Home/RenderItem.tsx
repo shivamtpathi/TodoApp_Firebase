@@ -1,41 +1,90 @@
-import {  StyleSheet, Text, View } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  TextInput,
+} from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 
 interface propsType {
-  title: string,
-  description: string
+  id: string;
+  title: string;
+  description: string;
+  onPressDelete: (id: string) => void;
+  userCollection: FirebaseFirestoreTypes.DocumentReference<FirebaseFirestoreTypes.DocumentData>;
 }
 
-const Heading = ({ title }:Pick<propsType, 'title'>) => <Text style={styles.headingText}>{title}</Text>;
-
-const Description = ({ description }: Pick<propsType, 'description'>) => (
-  <Text  style={styles.descriptionText}>{description}</Text>
-);
 
 const RenderItem = (props: propsType) => {
-  const { title, description } = props;
+  const { id, title, description, onPressDelete, userCollection } = props;
+  const [active, setActive] = useState(false);
+  const [editedTitle, setEditedTitle] = useState(title);
+  const [editedDescription, setEditedDescription] = useState(description);
+
+  const handleSave = async () => {
+    try {
+      await userCollection.collection('tasks').doc(id).update({
+        title: editedTitle,
+        description: editedDescription,
+      });
+      setActive(false);
+    } catch (error) {
+      console.log('Update task error', error);
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <Heading title={title}  />
-      <Description description={description}  />
+      <View style={{ width: '95%' }}>
+        {active ? (
+          <TextInput
+            value={editedTitle}
+            onChangeText={(v) => setEditedTitle(v)}
+            style={styles.headingText}
+          />
+        ) : (
+          <Text style={styles.headingText}>{editedTitle}</Text>
+        )}
+        {active ? (
+          <TextInput
+            value={editedDescription}
+            onChangeText={(v) => setEditedDescription(v)}
+            style={styles.descriptionText}
+          />
+        ) : (
+          <Text style={styles.descriptionText}>{editedDescription}</Text>
+        )}
+      </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity onPress={() => onPressDelete(id)}>
+          <MaterialCommunityIcons name="delete" size={25} color="green" />
+        </TouchableOpacity>
+        {active ? (
+          <TouchableOpacity onPress={handleSave} style={{ marginTop: 10 }}>
+            <FontAwesome name="save" size={25} color="green" />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            onPress={() => setActive(true)}
+            style={{ marginTop: 10 }}
+          >
+            <FontAwesome name="edit" size={25} color="green" />
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 };
 
-export default RenderItem;
-
 const styles = StyleSheet.create({
-  // container: {
-  //   backgroundColor: "#F3FBFF",
-  //   width: "100%",
-  //   padding: 12,
-  //   borderRadius: 5,
-  //   marginBottom:7,
-  //   // minHeight:400
-  // },
   container: {
-    backgroundColor: "#FfF",
+    flex: 1,
+    flexDirection: 'row',
+    backgroundColor: '#FfF',
     borderRadius: 5,
     padding: 14,
     marginBottom: 10,
@@ -47,15 +96,24 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 2,
     elevation: 2,
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
   },
   headingText: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: '500',
     marginBottom: 8,
-
+    color:"#000000"
   },
   descriptionText: {
     fontSize: 16,
-  
+  },
+ 
+  buttonContainer: {
+    alignItems: 'center',
+    width: '10%',
+    justifyContent: 'space-between',
   },
 });
+
+export default RenderItem;

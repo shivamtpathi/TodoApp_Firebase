@@ -33,8 +33,7 @@ const Login = ({ navigation }: propsType) => {
     try {
       const { email, UserPassword } = values;
       const userCredential = await auth().signInWithEmailAndPassword(email, UserPassword);
-      // console.log('userCredential', userCredential);
-      // navigation.navigate('SignUp');
+      
     } catch (error) {
       console.log('Login Error', error);
       Alert.alert('Something Went Wrong', 'Please Check Your Email And Password');
