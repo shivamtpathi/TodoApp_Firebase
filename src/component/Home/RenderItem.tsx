@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   StyleSheet,
   Text,
   View,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+import  {
+  FirebaseFirestoreTypes,
+} from '@react-native-firebase/firestore';
+
 
 interface propsType {
   id: string;
@@ -18,12 +22,16 @@ interface propsType {
   userCollection: FirebaseFirestoreTypes.DocumentReference<FirebaseFirestoreTypes.DocumentData>;
 }
 
-
 const RenderItem = (props: propsType) => {
-  const { id, title, description, onPressDelete, userCollection } = props;
+  const {id, title, description, onPressDelete, userCollection} = props;
   const [active, setActive] = useState(false);
   const [editedTitle, setEditedTitle] = useState(title);
   const [editedDescription, setEditedDescription] = useState(description);
+
+
+
+
+
 
   const handleSave = async () => {
     try {
@@ -33,17 +41,19 @@ const RenderItem = (props: propsType) => {
       });
       setActive(false);
     } catch (error) {
+      setActive(false);
+      Alert.alert('Some thing went wrong');
       console.log('Update task error', error);
     }
   };
 
   return (
     <View style={styles.container}>
-      <View style={{ width: '95%' }}>
+      <View style={{width: '84%'}}>
         {active ? (
           <TextInput
             value={editedTitle}
-            onChangeText={(v) => setEditedTitle(v)}
+            onChangeText={v => setEditedTitle(v)}
             style={styles.headingText}
           />
         ) : (
@@ -52,7 +62,7 @@ const RenderItem = (props: propsType) => {
         {active ? (
           <TextInput
             value={editedDescription}
-            onChangeText={(v) => setEditedDescription(v)}
+            onChangeText={v => setEditedDescription(v)}
             style={styles.descriptionText}
           />
         ) : (
@@ -64,14 +74,13 @@ const RenderItem = (props: propsType) => {
           <MaterialCommunityIcons name="delete" size={25} color="green" />
         </TouchableOpacity>
         {active ? (
-          <TouchableOpacity onPress={handleSave} style={{ marginTop: 10 }}>
+          <TouchableOpacity onPress={handleSave} style={{marginTop: 10}}>
             <FontAwesome name="save" size={25} color="green" />
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
             onPress={() => setActive(true)}
-            style={{ marginTop: 10 }}
-          >
+            style={{marginTop: 10}}>
             <FontAwesome name="edit" size={25} color="green" />
           </TouchableOpacity>
         )}
@@ -103,12 +112,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '500',
     marginBottom: 8,
-    color:"#000000"
+    color: '#000000',
   },
   descriptionText: {
     fontSize: 16,
   },
- 
+
   buttonContainer: {
     alignItems: 'center',
     width: '10%',

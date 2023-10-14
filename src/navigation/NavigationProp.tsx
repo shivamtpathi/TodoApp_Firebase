@@ -5,7 +5,8 @@ import { NavigationProp as prop, RouteProp } from '@react-navigation/native';
 export type ScreenList = {
   Login: undefined;
   SignUp: undefined;
-  Home:undefined
+  Home:undefined;
+  ForgetScreen:undefined;
   // Add more routes here if needed
 };
 

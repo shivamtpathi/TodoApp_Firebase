@@ -1,5 +1,5 @@
 import { Alert, StyleSheet, Text, View } from 'react-native';
-import React from 'react';
+import React, { useEffect,useState } from 'react';
 import UserInput from '../component/LoginAndSignUp/UserInput';
 import LoginButton from '../component/LoginAndSignUp/LoginButton';
 import LoginHeader from '../component/LoginAndSignUp/LoginHeader';
@@ -8,7 +8,7 @@ import { NavigationProp } from '../navigation/NavigationProp';
 import auth from '@react-native-firebase/auth';
 import { Formik } from 'formik';
 import * as yup from 'yup';
-
+import PushNotification from 'react-native-push-notification';
 interface propsType {
   navigation: NavigationProp;
 }
@@ -29,6 +29,11 @@ const validationSchema = yup.object().shape({
 });
 
 const Login = ({ navigation }: propsType) => {
+
+
+
+
+
   const HandleLogin = async (values: { email: string; UserPassword: string }) => {
     try {
       const { email, UserPassword } = values;
@@ -36,10 +41,21 @@ const Login = ({ navigation }: propsType) => {
       
     } catch (error) {
       console.log('Login Error', error);
-      Alert.alert('Something Went Wrong', 'Please Check Your Email And Password');
+      Alert.alert('Something Went Wrong', 'Please Check Your Email And Password or Internet connection');
     }
   };
 
+
+  useEffect(()=>{
+    PushNotification.createChannel(
+            {
+              channelId: 'channelId', 
+              channelName: 'channelName',
+            
+            },
+            (created) => console.log(`createChannel returned '${created}'`)
+          );
+  },[])
   return (
     <Formik
       initialValues={{ email: '', UserPassword: '' }}
@@ -48,7 +64,7 @@ const Login = ({ navigation }: propsType) => {
     >
       {({ values, handleChange, handleSubmit, errors, touched, isValid }) => (
         <View style={styles.container}>
-          <LoginHeader />
+          <LoginHeader  headingText="Welcome Back!" text="Enter Your Username & Password"/>
 
           <UserInput
             value={values.email}
@@ -71,7 +87,7 @@ const Login = ({ navigation }: propsType) => {
 
           <LoginButton title="Login" onPress={handleSubmit} />
 
-          <Bottom createAccountButton={() => navigation.navigate('SignUp')} />
+          <Bottom createAccountButton={() => navigation.navigate('SignUp') }   forgetButton={() => navigation.navigate('ForgetScreen')} />
         </View>
       )}
     </Formik>

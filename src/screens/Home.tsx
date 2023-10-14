@@ -4,6 +4,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
   ActivityIndicator,
+  View,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import HeadingInput from '../component/Home/HeadingInput';
@@ -13,6 +14,7 @@ import auth from '@react-native-firebase/auth';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {Alert} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import PushNotification from 'react-native-push-notification';
 
 const Home = () => {
   const [title, setTitle] = useState<string>('');
@@ -20,16 +22,19 @@ const Home = () => {
   const [getloading, setGetLoading] = useState<boolean>(true);
 
   const [description, setDescription] = useState<string>('');
+
   const [data, setData] = useState<
     {id: string; title: string; description: string}[]
   >([]);
-
+  console.log("kndimidmimi",data)
   const user = auth().currentUser;
+ 
   const userCollection = firestore().collection('users').doc(user?.uid);
   const fetchTasks = async () => {
     // setLoading(true)
     try {
       const snapshot = await userCollection.collection('tasks').get();
+      // console.log("kkkkkk",snapshot)
       const tasksData = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
@@ -44,9 +49,20 @@ const Home = () => {
     }
   };
 
+  const Notification = (message: string) => {
+    PushNotification.localNotification({
+      channelId: 'channelId',
+      bigText:message,
+      allowWhileIdle: true,
+      message: message, 
+    });
+  };
+  
+// Notification()
   const Post = async () => {
     setLoading(true);
     if (title == '' || description == '') {
+      setLoading(false);
       Alert.alert('please add work with it description');
     } else
       try {
@@ -54,13 +70,14 @@ const Home = () => {
           title,
           description,
         });
+        Notification('🚀 Task added successfully');
         setDescription('');
         setTitle('');
         fetchTasks();
         setLoading(false);
       } catch (error) {
         setLoading(false);
-
+        Alert.alert('Something went wrong');
         console.log('Post task error', error);
       }
   };
@@ -79,7 +96,10 @@ const Home = () => {
             try {
               await userCollection.collection('tasks').doc(taskId).delete();
               fetchTasks();
+              Notification('👍 Congratulations, you completed the task');
             } catch (error) {
+              Alert.alert('Something went wrong');
+
               console.log('Delete task error', error);
             }
           },
@@ -104,6 +124,8 @@ const Home = () => {
             try {
               await auth().signOut();
             } catch (error) {
+              Alert.alert('Something went wrong');
+
               console.error('Error signing out:', error);
             }
           },
@@ -117,9 +139,9 @@ const Home = () => {
   }, []);
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-        <Icon name="logout" size={30} color="green" />
-      </TouchableOpacity>
+      <View style={styles.logoutButton}>
+        <Icon onPress={handleLogout} name="logout" size={30} color="green" />
+      </View>
       <HeadingInput
         value={title}
         setValue={setTitle}
@@ -137,7 +159,7 @@ const Home = () => {
         {getloading ? (
           <ActivityIndicator size={30} color="green" />
         ) : (
-          data.map((item, index) => (
+         data.map((item, index) => (
             <RenderItem
               id={item.id}
               title={item.title}
