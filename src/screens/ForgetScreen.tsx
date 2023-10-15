@@ -1,12 +1,12 @@
-import { Alert, StyleSheet, Text, View } from 'react-native';
-import React, { useEffect,useState } from 'react';
+import {Alert, StyleSheet, Text, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import UserInput from '../component/LoginAndSignUp/UserInput';
 import LoginButton from '../component/LoginAndSignUp/LoginButton';
 import LoginHeader from '../component/LoginAndSignUp/LoginHeader';
 import Bottom from '../component/LoginAndSignUp/Bottom';
-import { NavigationProp } from '../navigation/NavigationProp';
+import {NavigationProp} from '../navigation/NavigationProp';
 import auth from '@react-native-firebase/auth';
-import { Formik } from 'formik';
+import {Formik} from 'formik';
 import * as yup from 'yup';
 interface propsType {
   navigation: NavigationProp;
@@ -17,36 +17,35 @@ const validationSchema = yup.object().shape({
     .string()
     .required('Email is required')
     .email('Invalid email format'),
-  
 });
 
-const ForgetScreen = ({ navigation }: propsType) => {
-
-
-
-
-    const HandleForget = async (values: { email: string }) => {
-        try {
-          const { email } = values;
-          await auth().sendPasswordResetEmail(email);
-          Alert.alert('Password Reset Email Sent', 'Check your email to reset your password.');
-          navigation.goBack(); 
-        } catch (error) {
-          console.log('Password Reset Error', error);
-          Alert.alert('Password Reset Failed', 'Something went wrong. Please check your email or internet connection.');
-        }
-      };
-
+const ForgetScreen = ({navigation}: propsType) => {
+  const HandleForget = async (values: {email: string}) => {
+    try {
+      const {email} = values;
+      await auth().sendPasswordResetEmail(email);
+      Alert.alert(
+        'Password Reset Email Sent',
+        'Check your email to reset your password.',
+      );
+      navigation.goBack();
+    } catch (error) {
+      console.log('Password Reset Error', error);
+      Alert.alert(
+        'Password Reset Failed',
+        'Something went wrong. Please check your email or internet connection.',
+      );
+    }
+  };
 
   return (
     <Formik
-      initialValues={{ email:''}}
+      initialValues={{email: ''}}
       validationSchema={validationSchema}
-      onSubmit={HandleForget}
-    >
-      {({ values, handleChange, handleSubmit, errors, touched, isValid }) => (
+      onSubmit={HandleForget}>
+      {({values, handleChange, handleSubmit, errors, touched, isValid}) => (
         <View style={styles.container}>
-                   <LoginHeader  headingText="Forget Password!" text="Enter Your Email"/>
+          <LoginHeader headingText="Forget Password!" text="Enter Your Email" />
 
           <UserInput
             value={values.email}
@@ -57,10 +56,7 @@ const ForgetScreen = ({ navigation }: propsType) => {
             <Text style={styles.errorText}>{errors.email}</Text>
           )}
 
-          
-
           <LoginButton title="Get Link" onPress={handleSubmit} />
-
         </View>
       )}
     </Formik>
